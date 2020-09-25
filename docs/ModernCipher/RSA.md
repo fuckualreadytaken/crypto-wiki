@@ -62,4 +62,40 @@ ed = 1 mod φ(n)
 &emsp;=17 x 593 - 1680 x 6  
 两边同时除以1680得：17 x 593 = 1 mod 1680  
 因此d = 593  
-## 模平方重复法
+## 模幂运算
+肯定有很多小伙伴疑惑这个1144^593 mod 1763具体是怎么计算的，因为直接拿代码先计算1144^593可能会报错（之前用Python 3.5会报数值太大的错，现在用3.7好像能计算出来，但是真正用到生活中的比较大的数，用代码直接计算幂肯定不行），不过这后面有个求模运算，因此可以采用求模运算的性质。  
+&emsp;&emsp;性质1：(a x b) mod n = ((a mod n) x (b mod n)) mod n
+&emsp;&emsp;性质2：(a + b) mod n = ((a mod n) + (b mod n)) mod n
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;(a - b) mod n = ((a mod n) - (b mod n)) mod n
+根据上述性质，可以很容易计算1144^593 mod 1763  
+
+1. 首先将593表示为2的幂；
+   593 = 2^9(512) + 2^6(64) + 2^4(16) + 2^0(1)
+   化为二进制为：1001010001
+2. 计算；
+   原式可以表示为： 1144^ (2^9 + 2^6 + 2^4 + 2^0) mod 1763  
+   这样的话，就可以先算a1 = 1144^2 mod 1763
+   那么，a2 = a1^2 mod 1763 = 1144^ (2 ^ 2 ) mod 1763  
+        a3 = a2^2 mod 1763 = 1144^ (2 ^ 3) mod 1763
+    按照这样算下去，就很容易算出1144^ (2^9) mod 1763,1144^ (2^6) mod 1763,1144^ (2^4) mod 1763，然后根据**性质1**计算出整个式子的值
+
+这个算法实现起来也比较容易：
+
+参考代码：  
+
+```python
+def ModExp(n, k, m):
+        """This method is use to calculate the big Modular Exponentiation
+        :param n: Base
+        :param k: Component
+        :param m: Modulus
+        """
+        a = list(bin(k))[2:]
+        a.reverse()
+        s = 1
+        for i in a:
+            if i == '1':
+                s = (s * n) % m
+            n = (n * n) % m
+        return s
+```
